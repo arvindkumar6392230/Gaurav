@@ -1,0 +1,7 @@
+{
+  "name": "Palak’s Date Invite",
+  "description": "A tiny date invitation with one very serious transaction.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
