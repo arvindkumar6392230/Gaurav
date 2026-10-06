@@ -52,7 +52,6 @@ const LOCAL_STORAGE_TIME = 'palak-time-choice';
 const LOCAL_STORAGE_MEAL = 'palak-meal-choice';
 const LOCAL_STORAGE_PAID = 'palak-paid-confirmed';
 const LOCAL_STORAGE_IS_ADMIN = 'palak-invite-is-admin';
-const ARVIND_EMAIL = 'arvindkumar6392230@gmail.com';
 
 function getButtonBounds(el: HTMLElement) {
   const w = el.offsetWidth;
@@ -119,7 +118,7 @@ function formatChatTime(dateStr: string) {
 }
 
 export default function App() {
-  // Check if current user is Admin (Arvind). Hidden by default from visitors/Palak!
+  // Check if current user is Admin. Hidden by default from visitors!
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -132,11 +131,9 @@ export default function App() {
         return false;
       }
 
-      // Explicit admin access parameter (?admin=true or ?admin=arvind or ?secret=arvind)
+      // Explicit admin access parameter (?admin=true or ?secret=true)
       if (
         adminParam === 'true' ||
-        adminParam === 'arvind' ||
-        secretParam === 'arvind' ||
         secretParam === 'true'
       ) {
         localStorage.setItem(LOCAL_STORAGE_IS_ADMIN, 'true');
@@ -484,7 +481,7 @@ export default function App() {
     }
   };
 
-  // Admin Direct Link to Step 6 (Responses & Chat) for Arvind (Includes ?admin=true)
+  // Admin Direct Link to Step 6 (Responses & Chat) (Includes ?admin=true)
   const copyAdminLastPageLink = async () => {
     try {
       const url = new URL(window.location.href);
@@ -582,7 +579,7 @@ export default function App() {
   const handleNotifyEmail = () => {
     const subject = encodeURIComponent('Palak said YES! 💖 (Date Invite RSVP)');
     const body = encodeURIComponent(generateNotificationSummary());
-    window.open(`mailto:${ARVIND_EMAIL}?subject=${subject}&body=${body}`, '_blank');
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
   };
 
   const handleCopyNotification = () => {
@@ -627,20 +624,20 @@ export default function App() {
         <span className="text-[10px] text-rose-600 font-bold underline">Switch</span>
       </button>
 
-      {/* Floating Notification Button so Arvind can always see choices */}
+      {/* Floating Notification Button to see choices */}
       {step >= 2 && (
         <button
           type="button"
           className="floating-notify-trigger"
           onClick={() => setShowNotifyModal(true)}
-          aria-label="View choices & notify Arvind"
+          aria-label="View choices summary"
         >
           <Bell size={14} className="text-pink-600 animate-pulse" />
           <span>Choices Summary 🔔</span>
         </button>
       )}
 
-      {/* Top Floating Admin Direct Access Pill - ONLY VISIBLE TO ADMIN (ARVIND) */}
+      {/* Top Floating Admin Direct Access Pill - ONLY VISIBLE TO ADMIN */}
       {isAdmin && (
         <div className="fixed top-4 right-4 z-40 flex items-center gap-2">
           {step !== 6 ? (
@@ -756,13 +753,13 @@ export default function App() {
               {copiedLink ? 'Invite link copied ♥' : ''}
             </p>
 
-            {/* Admin / Creator Direct Access Section - ONLY SHOWN TO ARVIND / ADMIN */}
+            {/* Admin / Creator Direct Access Section - ONLY SHOWN TO ADMIN */}
             {isAdmin && (
               <div className="admin-creator-box" aria-label="Admin creator tools">
                 <div className="admin-creator-header">
                   <div className="flex items-center gap-1.5 font-bold text-xs text-amber-900">
                     <Crown size={15} className="text-amber-600" />
-                    <span>Admin / Creator Tools (Arvind)</span>
+                    <span>Admin / Creator Tools</span>
                   </div>
                   <span className="admin-creator-pill">Secret Admin Mode</span>
                 </div>
@@ -966,7 +963,7 @@ export default function App() {
               </p>
             )}
 
-            {/* ADMIN / CREATOR PANEL: ONLY SHOWN TO ARVIND / ADMIN */}
+            {/* ADMIN / CREATOR PANEL: ONLY SHOWN IN ADMIN MODE */}
             {isAdmin && (
               <div className="admin-responses-card" aria-label="Admin responses summary">
                 <div className="admin-responses-top">
@@ -1058,11 +1055,11 @@ export default function App() {
               </div>
             )}
 
-            {/* Notification Section: So Arvind gets notified of what she chose */}
+            {/* Notification Section: Summary of what she chose */}
             <div className="notify-box" aria-label="Notification details">
               <div className="notify-header">
                 <span className="notify-title">
-                  <Bell size={16} /> Auto-Notify Arvind
+                  <Bell size={16} /> Notification Summary
                 </span>
                 <span className="notify-badge">Auto-Sent to Chat Below ✓</span>
               </div>
@@ -1071,7 +1068,7 @@ export default function App() {
                   <strong>Status:</strong> She said YES! 💖
                 </p>
                 <p>
-                  <strong>Date & Time:</strong> {selectedDate || 'Not specified'} at {selectedTime || 'Evening'}
+                  <strong>Date &amp; Time:</strong> {selectedDate || 'Not specified'} at {selectedTime || 'Evening'}
                 </p>
                 <p>
                   <strong>Food Craving:</strong> {selectedMeal || 'Not specified'}
@@ -1090,7 +1087,7 @@ export default function App() {
                   type="button"
                   onClick={handleNotifyWhatsApp}
                   className="notify-action-btn whatsapp"
-                  title="Notify Arvind on WhatsApp"
+                  title="Share on WhatsApp"
                 >
                   <MessageCircle size={14} /> Send on WhatsApp
                 </button>
@@ -1098,9 +1095,9 @@ export default function App() {
                   type="button"
                   onClick={handleNotifyEmail}
                   className="notify-action-btn email"
-                  title="Email choices to Arvind"
+                  title="Email choices"
                 >
-                  <Mail size={14} /> Email Arvind
+                  <Mail size={14} /> Email Choices
                 </button>
                 <button
                   type="button"
@@ -1324,18 +1321,18 @@ export default function App() {
               <button
                 type="button"
                 onClick={handleNotifyWhatsApp}
-                className="w-full py-2.5 px-4 rounded-xl text-white text-xs font-semibold flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-sm"
+                className="w-full py-2.5 px-4 rounded-xl text-white text-xs font-semibold flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-sm cursor-pointer"
               >
                 <MessageCircle size={15} />
-                <span>Notify Arvind on WhatsApp</span>
+                <span>Share on WhatsApp</span>
               </button>
               <button
                 type="button"
                 onClick={handleNotifyEmail}
-                className="w-full py-2.5 px-4 rounded-xl text-white text-xs font-semibold flex items-center justify-center gap-2 bg-rose-400 hover:bg-rose-500 shadow-sm"
+                className="w-full py-2.5 px-4 rounded-xl text-white text-xs font-semibold flex items-center justify-center gap-2 bg-rose-400 hover:bg-rose-500 shadow-sm cursor-pointer"
               >
                 <Mail size={15} />
-                <span>Email to Arvind</span>
+                <span>Email Summary</span>
               </button>
               <button
                 type="button"

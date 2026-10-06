@@ -226,7 +226,7 @@ export const AnimatedTeddy: React.FC = () => {
 
     // Pop speech bubble
     const quotes = [
-      'Palak ♥ Arvind',
+      'You & Me Forever ♥',
       'Please say YES! 🥺💖',
       'I will love you forever! 🥰',
       'You are my universe! 🌌♥',
