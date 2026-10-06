@@ -1,6 +1,21 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import { MessageSquare, Send, Trash2, Bell, MessageCircle, Mail, Copy, Check, X, Sparkles } from 'lucide-react';
+import {
+  MessageSquare,
+  Send,
+  Trash2,
+  Bell,
+  MessageCircle,
+  Mail,
+  Copy,
+  Check,
+  X,
+  Sparkles,
+  Crown,
+  ArrowRight,
+  ArrowLeft,
+  Eye,
+} from 'lucide-react';
 import { InteractiveCatScene } from './components/InteractiveCatScene';
 import { AnimatedTeddy } from './components/AnimatedTeddy';
 
@@ -32,6 +47,11 @@ const MEALS = [
 const LOCAL_STORAGE_SENDER_ID = 'palak-chat-sender-id';
 const LOCAL_STORAGE_DISPLAY_NAME = 'palak-chat-display-name';
 const LOCAL_STORAGE_MESSAGES = 'palak-chat-messages-store';
+const LOCAL_STORAGE_DATE = 'palak-date-choice';
+const LOCAL_STORAGE_TIME = 'palak-time-choice';
+const LOCAL_STORAGE_MEAL = 'palak-meal-choice';
+const LOCAL_STORAGE_PAID = 'palak-paid-confirmed';
+const LOCAL_STORAGE_IS_ADMIN = 'palak-invite-is-admin';
 const ARVIND_EMAIL = 'arvindkumar6392230@gmail.com';
 
 function getButtonBounds(el: HTMLElement) {
@@ -99,14 +119,135 @@ function formatChatTime(dateStr: string) {
 }
 
 export default function App() {
-  const [step, setStep] = useState(1);
+  // Check if current user is Admin (Arvind). Hidden by default from visitors/Palak!
+  const [isAdmin, setIsAdmin] = useState<boolean>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const adminParam = params.get('admin');
+      const secretParam = params.get('secret');
+
+      // Allow switching back to visitor mode for testing
+      if (adminParam === 'logout' || adminParam === 'false' || adminParam === 'visitor') {
+        localStorage.removeItem(LOCAL_STORAGE_IS_ADMIN);
+        return false;
+      }
+
+      // Explicit admin access parameter (?admin=true or ?admin=arvind or ?secret=arvind)
+      if (
+        adminParam === 'true' ||
+        adminParam === 'arvind' ||
+        secretParam === 'arvind' ||
+        secretParam === 'true'
+      ) {
+        localStorage.setItem(LOCAL_STORAGE_IS_ADMIN, 'true');
+        return true;
+      }
+
+      // Check if this device previously unlocked admin mode
+      return localStorage.getItem(LOCAL_STORAGE_IS_ADMIN) === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const [secretTapCount, setSecretTapCount] = useState(0);
+
+  // Hidden easter egg to unlock admin mode without URL parameter (tap 4 times within 2 seconds)
+  const handleSecretTap = () => {
+    const next = secretTapCount + 1;
+    if (next >= 4) {
+      setIsAdmin(true);
+      try {
+        localStorage.setItem(LOCAL_STORAGE_IS_ADMIN, 'true');
+      } catch {
+        // Ignore
+      }
+      setSecretTapCount(0);
+    } else {
+      setSecretTapCount(next);
+      setTimeout(() => setSecretTapCount(0), 1800);
+    }
+  };
+
+  // Exit admin view and return to visitor view
+  const handleExitAdmin = () => {
+    setIsAdmin(false);
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_IS_ADMIN);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('admin');
+      url.searchParams.delete('secret');
+      window.history.replaceState({}, '', url.toString());
+    } catch {
+      // Ignore
+    }
+  };
+
+  // Support direct last page access for admin via ?step=6 or ?view=responses or ?admin=true
+  const [step, setStep] = useState<number>(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const stepParam = params.get('step');
+      const viewParam = params.get('view');
+      const pageParam = params.get('page');
+      const adminParam = params.get('admin');
+      if (
+        stepParam === '6' ||
+        viewParam === 'responses' ||
+        viewParam === 'last' ||
+        pageParam === 'last' ||
+        adminParam === 'true'
+      ) {
+        return 6;
+      }
+      if (stepParam && !isNaN(Number(stepParam))) {
+        const s = Number(stepParam);
+        if (s >= 1 && s <= 6) return s;
+      }
+    } catch {
+      // fallback
+    }
+    return 1;
+  });
+
   const [noPosition, setNoPosition] = useState<{ left: number; top: number } | null>(null);
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
+
+  // Read saved choices so Admin immediately sees them on load
+  const [selectedDate, setSelectedDate] = useState(() => {
+    try {
+      return localStorage.getItem(LOCAL_STORAGE_DATE) || '';
+    } catch {
+      return '';
+    }
+  });
+
+  const [selectedTime, setSelectedTime] = useState(() => {
+    try {
+      return localStorage.getItem(LOCAL_STORAGE_TIME) || '';
+    } catch {
+      return '';
+    }
+  });
+
+  const [selectedMeal, setSelectedMeal] = useState(() => {
+    try {
+      return localStorage.getItem(LOCAL_STORAGE_MEAL) || '';
+    } catch {
+      return '';
+    }
+  });
+
   const [dateError, setDateError] = useState('');
-  const [selectedMeal, setSelectedMeal] = useState('');
   const [copiedLink, setCopiedLink] = useState(false);
-  const [paid, setPaid] = useState(false);
+  const [copiedAdminLink, setCopiedAdminLink] = useState(false);
+
+  const [paid, setPaid] = useState(() => {
+    try {
+      return localStorage.getItem(LOCAL_STORAGE_PAID) === 'true';
+    } catch {
+      return false;
+    }
+  });
 
   // Notification state
   const [notificationCopied, setNotificationCopied] = useState(false);
@@ -259,6 +400,47 @@ export default function App() {
     setNoPosition(calculateDodge(shell, noBtn, curr));
   };
 
+  // Synchronize step changes with browser history and URL query parameter
+  const goToStep = (newStep: number) => {
+    setStep(newStep);
+    try {
+      const url = new URL(window.location.href);
+      if (newStep === 6) {
+        url.searchParams.set('step', '6');
+      } else if (newStep === 1) {
+        url.searchParams.delete('step');
+        url.searchParams.delete('admin');
+        url.searchParams.delete('view');
+        url.searchParams.delete('page');
+      } else {
+        url.searchParams.set('step', newStep.toString());
+      }
+      window.history.replaceState({}, '', url.toString());
+    } catch {
+      // Ignore
+    }
+  };
+
+  // Support browser Back/Forward navigation
+  useEffect(() => {
+    const handlePopState = () => {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const stepParam = params.get('step');
+        if (stepParam && !isNaN(Number(stepParam))) {
+          const s = Number(stepParam);
+          if (s >= 1 && s <= 6) setStep(s);
+        } else {
+          setStep(1);
+        }
+      } catch {
+        setStep(1);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // YES Click Animation & Transition
   const handleYesClick = () => {
     // Joyful heart & sparkling confetti animation
@@ -278,16 +460,45 @@ export default function App() {
       });
     }, 280);
 
-    setStep(2);
+    goToStep(2);
   };
 
+  // Clean Invite link for Palak (ALWAYS starts on Step 1, NO admin parameters)
   const copyInviteLink = async () => {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('step');
+      url.searchParams.delete('view');
+      url.searchParams.delete('admin');
+      url.searchParams.delete('secret');
+      url.searchParams.delete('page');
+      const cleanUrl = url.toString();
+      await navigator.clipboard.writeText(cleanUrl);
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 3000);
     } catch {
-      window.prompt('Copy this link to share:', window.location.href);
+      const url = new URL(window.location.href);
+      url.searchParams.delete('step');
+      url.searchParams.delete('admin');
+      window.prompt('Copy invite link for Palak (Visitor View):', url.toString());
+    }
+  };
+
+  // Admin Direct Link to Step 6 (Responses & Chat) for Arvind (Includes ?admin=true)
+  const copyAdminLastPageLink = async () => {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('admin', 'true');
+      url.searchParams.set('step', '6');
+      const adminUrl = url.toString();
+      await navigator.clipboard.writeText(adminUrl);
+      setCopiedAdminLink(true);
+      setTimeout(() => setCopiedAdminLink(false), 3000);
+    } catch {
+      const url = new URL(window.location.href);
+      url.searchParams.set('admin', 'true');
+      url.searchParams.set('step', '6');
+      window.prompt('Direct Admin link to last page (responses & chat):', url.toString());
     }
   };
 
@@ -298,7 +509,13 @@ export default function App() {
       return;
     }
     setDateError('');
-    setStep(4);
+    try {
+      localStorage.setItem(LOCAL_STORAGE_DATE, selectedDate);
+      localStorage.setItem(LOCAL_STORAGE_TIME, selectedTime);
+    } catch {
+      // Ignore
+    }
+    goToStep(4);
   };
 
   // Notification generation
@@ -423,6 +640,48 @@ export default function App() {
         </button>
       )}
 
+      {/* Top Floating Admin Direct Access Pill - ONLY VISIBLE TO ADMIN (ARVIND) */}
+      {isAdmin && (
+        <div className="fixed top-4 right-4 z-40 flex items-center gap-2">
+          {step !== 6 ? (
+            <button
+              type="button"
+              onClick={() => goToStep(6)}
+              className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-rose-300 shadow-md text-rose-900 transition-all flex items-center gap-1.5 cursor-pointer hover:shadow-lg hover:border-rose-400 group"
+              title="Admin: View Palak's selected choices & chat on the last page"
+            >
+              <Crown size={14} className="text-amber-500 group-hover:scale-110 transition-transform" />
+              <span>Admin: Responses &amp; Chat</span>
+              <ArrowRight size={12} className="text-rose-500" />
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-rose-500 text-white backdrop-blur-md shadow-md flex items-center gap-1">
+                <Crown size={13} />
+                <span>Admin View (Step 6)</span>
+              </span>
+              <button
+                type="button"
+                onClick={() => goToStep(1)}
+                className="text-xs font-semibold px-2.5 py-1.5 rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-rose-200 shadow-sm text-slate-700 transition-all flex items-center gap-1 cursor-pointer"
+                title="Preview Step 1 Invitation"
+              >
+                <ArrowLeft size={12} />
+                <span>Step 1</span>
+              </button>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={handleExitAdmin}
+            className="text-[10px] font-semibold px-2.5 py-1.5 rounded-full bg-slate-800/85 hover:bg-slate-900 text-white backdrop-blur-md shadow-sm transition-all cursor-pointer"
+            title="Exit admin mode and switch to normal visitor view"
+          >
+            Visitor View
+          </button>
+        </div>
+      )}
+
       {/* Main Invitation Shell */}
       <main className="invite-shell" ref={containerRef}>
         <section className="invite-card" aria-label="A little date invitation">
@@ -451,6 +710,8 @@ export default function App() {
             aria-valuenow={step}
             aria-valuemin={1}
             aria-valuemax={6}
+            onClick={handleSecretTap}
+            title={isAdmin ? 'Admin Mode Active' : undefined}
           >
             {Array.from({ length: 6 }, (_, idx) => (
               <span
@@ -494,6 +755,51 @@ export default function App() {
             <p className="copy-status" aria-live="polite">
               {copiedLink ? 'Invite link copied ♥' : ''}
             </p>
+
+            {/* Admin / Creator Direct Access Section - ONLY SHOWN TO ARVIND / ADMIN */}
+            {isAdmin && (
+              <div className="admin-creator-box" aria-label="Admin creator tools">
+                <div className="admin-creator-header">
+                  <div className="flex items-center gap-1.5 font-bold text-xs text-amber-900">
+                    <Crown size={15} className="text-amber-600" />
+                    <span>Admin / Creator Tools (Arvind)</span>
+                  </div>
+                  <span className="admin-creator-pill">Secret Admin Mode</span>
+                </div>
+                <p className="admin-creator-desc">
+                  Check what Palak selected (date, time, food vibe) &amp; what she wants to talk about.
+                </p>
+                <div className="admin-creator-actions">
+                  <button
+                    type="button"
+                    className="admin-jump-btn"
+                    onClick={() => goToStep(6)}
+                    data-testid="button-admin-last-page"
+                  >
+                    <Eye size={14} />
+                    <span>View Responses &amp; Chat (Last Page) →</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-copy-btn"
+                    onClick={copyAdminLastPageLink}
+                    data-testid="button-copy-admin-link"
+                  >
+                    {copiedAdminLink ? (
+                      <>
+                        <Check size={14} className="text-emerald-700" />
+                        <span className="text-emerald-800 font-semibold">Secret Admin Link Copied! ✓</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={14} />
+                        <span>Copy Secret Link to Last Page 📋</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            )}
           </section>
 
           {/* STEP 2: Wait you actually said yes?? */}
@@ -506,7 +812,7 @@ export default function App() {
             <button
               className="pill-button"
               type="button"
-              onClick={() => setStep(3)}
+              onClick={() => goToStep(3)}
               data-testid="button-okay-okay"
             >
               okay okay! →
@@ -584,7 +890,12 @@ export default function App() {
                   aria-pressed={selectedMeal === meal.name}
                   onClick={() => {
                     setSelectedMeal(meal.name);
-                    setStep(5);
+                    try {
+                      localStorage.setItem(LOCAL_STORAGE_MEAL, meal.name);
+                    } catch {
+                      // Ignore
+                    }
+                    goToStep(5);
                   }}
                   data-testid={`choice-meal-${meal.name.toLowerCase()}`}
                 >
@@ -606,7 +917,7 @@ export default function App() {
             <button
               className="pill-button"
               type="button"
-              onClick={() => setStep(6)}
+              onClick={() => goToStep(6)}
               data-testid="button-accept"
             >
               ok I accept ✨
@@ -634,8 +945,12 @@ export default function App() {
               className="pill-button"
               type="button"
               onClick={() => {
-                window.alert('Transaction Complete! See you at 6!');
                 setPaid(true);
+                try {
+                  localStorage.setItem(LOCAL_STORAGE_PAID, 'true');
+                } catch {
+                  // Ignore
+                }
               }}
               data-testid="button-pay-joke"
             >
@@ -649,6 +964,98 @@ export default function App() {
               <p className="success-note" role="status">
                 paid in affection. ♥
               </p>
+            )}
+
+            {/* ADMIN / CREATOR PANEL: ONLY SHOWN TO ARVIND / ADMIN */}
+            {isAdmin && (
+              <div className="admin-responses-card" aria-label="Admin responses summary">
+                <div className="admin-responses-top">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
+                    <Crown size={15} className="text-amber-600" />
+                    <span>Admin Panel: What Palak Selected &amp; Chat</span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-rose-700 bg-rose-100/90 px-2 py-0.5 rounded-full border border-rose-200/80">
+                    Confirmed Choices
+                  </span>
+                </div>
+
+                <div className="admin-selections-grid">
+                  <div className="admin-selection-item">
+                    <span className="admin-label">💍 Status</span>
+                    <span className="admin-val font-bold text-rose-700">She said YES! 💖</span>
+                  </div>
+                  <div className="admin-selection-item">
+                    <span className="admin-label">📅 Chosen Date</span>
+                    <span className="admin-val">{selectedDate || 'Waiting for Palak to pick'}</span>
+                  </div>
+                  <div className="admin-selection-item">
+                    <span className="admin-label">⏰ Chosen Time</span>
+                    <span className="admin-val">{selectedTime || 'Evening (6:00 PM)'}</span>
+                  </div>
+                  <div className="admin-selection-item">
+                    <span className="admin-label">🍽️ Food Vibe</span>
+                    <span className="admin-val">{selectedMeal || 'Waiting for craving'}</span>
+                  </div>
+                </div>
+
+                <div className="admin-chat-notice">
+                  <MessageSquare size={14} className="text-pink-600 flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong>What she wants to talk about:</strong> Check her live messages in the chat section below or send her a reply!
+                  </span>
+                </div>
+
+                <div className="admin-responses-btns">
+                  <button
+                    type="button"
+                    onClick={copyAdminLastPageLink}
+                    className="admin-card-btn"
+                    title="Copy direct link to this responses &amp; chat page"
+                  >
+                    {copiedAdminLink ? (
+                      <>
+                        <Check size={13} className="text-emerald-400" />
+                        <span>Last Page Link Copied! ✓</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={13} />
+                        <span>Copy Last Page Link (For Admin) 📋</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={copyInviteLink}
+                    className="admin-card-btn secondary"
+                    title="Copy clean invitation link for Palak"
+                  >
+                    {copiedLink ? (
+                      <>
+                        <Check size={13} className="text-emerald-600" />
+                        <span>Invite Link Copied! ✓</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={13} />
+                        <span>Copy Palak's Invite Link 💌</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => goToStep(1)}
+                    className="admin-card-btn secondary"
+                    style={{ flex: '1 1 100%' }}
+                    title="Preview the invitation from step 1"
+                  >
+                    <ArrowLeft size={13} />
+                    <span>Preview Step 1 (Invitation Letter)</span>
+                  </button>
+                </div>
+              </div>
             )}
 
             {/* Notification Section: So Arvind gets notified of what she chose */}

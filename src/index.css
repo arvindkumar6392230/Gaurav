@@ -1150,3 +1150,215 @@ select:focus-visible,
 .animate-float-fade {
   animation: float-fade 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Admin / Creator Tools Styles */
+.admin-creator-box {
+  width: min(100%, 460px);
+  margin: 16px auto 0;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(244, 143, 177, 0.55);
+  border-radius: 20px;
+  box-shadow: 0 10px 24px rgba(137, 58, 91, 0.08);
+  text-align: left;
+}
+
+.admin-creator-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.admin-creator-pill {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #b45309;
+  background: rgba(254, 243, 199, 0.95);
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  padding: 2px 7px;
+  border-radius: 9999px;
+}
+
+.admin-creator-desc {
+  margin: 0 0 10px;
+  color: #88576a;
+  font-size: 0.77rem;
+  line-height: 1.45;
+}
+
+.admin-creator-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+@media (min-width: 480px) {
+  .admin-creator-actions {
+    grid-template-columns: 1.15fr 1fr;
+  }
+}
+
+.admin-jump-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #e11d48, #be185d);
+  color: #fff;
+  border: 0;
+  border-radius: 14px;
+  padding: 9px 12px;
+  font-size: 0.77rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
+  transition: all 0.2s ease;
+}
+
+.admin-jump-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(225, 29, 72, 0.35);
+  background: linear-gradient(135deg, #f43f5e, #db2777);
+}
+
+.admin-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #832b4f;
+  border: 1px solid rgba(244, 143, 177, 0.65);
+  border-radius: 14px;
+  padding: 9px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-copy-btn:hover {
+  background: #fff;
+  border-color: #e11d48;
+  color: #be185d;
+}
+
+/* Admin Responses Card on Step 6 */
+.admin-responses-card {
+  width: min(100%, 480px);
+  margin: 16px auto 0;
+  padding: 16px 18px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(244, 143, 177, 0.55);
+  border-radius: 24px;
+  box-shadow: 0 12px 28px rgba(137, 58, 91, 0.1);
+  text-align: left;
+}
+
+.admin-responses-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(244, 143, 177, 0.3);
+}
+
+.admin-selections-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 440px) {
+  .admin-selections-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-selection-item {
+  background: rgba(255, 245, 248, 0.85);
+  border: 1px solid rgba(244, 143, 177, 0.35);
+  border-radius: 14px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-label {
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #9f4a6b;
+  letter-spacing: 0.04em;
+  margin-bottom: 2px;
+}
+
+.admin-val {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #651f38;
+}
+
+.admin-chat-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: rgba(254, 242, 242, 0.92);
+  border: 1px solid rgba(252, 165, 165, 0.55);
+  border-radius: 14px;
+  padding: 9px 12px;
+  font-size: 0.77rem;
+  color: #991b1b;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.admin-responses-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-card-btn {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #762b48;
+  color: #fff;
+  border: 0;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-card-btn:hover {
+  background: #5d1c34;
+  transform: translateY(-1px);
+}
+
+.admin-card-btn.secondary {
+  background: rgba(255, 255, 255, 0.92);
+  color: #762b48;
+  border: 1px solid rgba(118, 43, 72, 0.4);
+}
+
+.admin-card-btn.secondary:hover {
+  background: #fff;
+  border-color: #762b48;
+}
+
