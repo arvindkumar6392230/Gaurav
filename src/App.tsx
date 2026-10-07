@@ -19,6 +19,24 @@ import {
 import { InteractiveCatScene } from './components/InteractiveCatScene';
 import { AnimatedTeddy } from './components/AnimatedTeddy';
 
+// 1. FIREBASE IMPORTS ADD KIYE GAYE HAIN
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, onValue, set, remove } from 'firebase/database';
+
+// 2. TUMHARA FIREBASE CONFIG YAHAN HAI
+const firebaseConfig = {
+  apiKey: "AIzaSyB1BjoXufp9C8dvHtqaQ64aHpkSE86vE_U",
+  authDomain: "a-little-place-for-us1.firebaseapp.com",
+  projectId: "a-little-place-for-us1",
+  storageBucket: "a-little-place-for-us1.firebasestorage.app",
+  messagingSenderId: "401912927528",
+  appId: "1:401912927528:web:639d78d2c4e9ad23802c1d"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 interface ChatItem {
   id: string;
   senderId: string;
@@ -46,7 +64,6 @@ const MEALS = [
 
 const LOCAL_STORAGE_SENDER_ID = 'palak-chat-sender-id';
 const LOCAL_STORAGE_DISPLAY_NAME = 'palak-chat-display-name';
-const LOCAL_STORAGE_MESSAGES = 'palak-chat-messages-store';
 const LOCAL_STORAGE_DATE = 'palak-date-choice';
 const LOCAL_STORAGE_TIME = 'palak-time-choice';
 const LOCAL_STORAGE_MEAL = 'palak-meal-choice';
@@ -118,29 +135,19 @@ function formatChatTime(dateStr: string) {
 }
 
 export default function App() {
-  // Check if current user is Admin. Hidden by default from visitors!
   const [isAdmin, setIsAdmin] = useState<boolean>(() => {
     try {
       const params = new URLSearchParams(window.location.search);
       const adminParam = params.get('admin');
       const secretParam = params.get('secret');
-
-      // Allow switching back to visitor mode for testing
       if (adminParam === 'logout' || adminParam === 'false' || adminParam === 'visitor') {
         localStorage.removeItem(LOCAL_STORAGE_IS_ADMIN);
         return false;
       }
-
-      // Explicit admin access parameter (?admin=true or ?secret=true)
-      if (
-        adminParam === 'true' ||
-        secretParam === 'true'
-      ) {
+      if (adminParam === 'true' || secretParam === 'true') {
         localStorage.setItem(LOCAL_STORAGE_IS_ADMIN, 'true');
         return true;
       }
-
-      // Check if this device previously unlocked admin mode
       return localStorage.getItem(LOCAL_STORAGE_IS_ADMIN) === 'true';
     } catch {
       return false;
@@ -149,16 +156,11 @@ export default function App() {
 
   const [secretTapCount, setSecretTapCount] = useState(0);
 
-  // Hidden easter egg to unlock admin mode without URL parameter (tap 4 times within 2 seconds)
   const handleSecretTap = () => {
     const next = secretTapCount + 1;
     if (next >= 4) {
       setIsAdmin(true);
-      try {
-        localStorage.setItem(LOCAL_STORAGE_IS_ADMIN, 'true');
-      } catch {
-        // Ignore
-      }
+      try { localStorage.setItem(LOCAL_STORAGE_IS_ADMIN, 'true'); } catch {}
       setSecretTapCount(0);
     } else {
       setSecretTapCount(next);
@@ -166,7 +168,6 @@ export default function App() {
     }
   };
 
-  // Exit admin view and return to visitor view
   const handleExitAdmin = () => {
     setIsAdmin(false);
     try {
@@ -175,12 +176,9 @@ export default function App() {
       url.searchParams.delete('admin');
       url.searchParams.delete('secret');
       window.history.replaceState({}, '', url.toString());
-    } catch {
-      // Ignore
-    }
+    } catch {}
   };
 
-  // Support direct last page access for admin via ?step=6 or ?view=responses or ?admin=true
   const [step, setStep] = useState<number>(() => {
     try {
       const params = new URLSearchParams(window.location.search);
@@ -188,50 +186,29 @@ export default function App() {
       const viewParam = params.get('view');
       const pageParam = params.get('page');
       const adminParam = params.get('admin');
-      if (
-        stepParam === '6' ||
-        viewParam === 'responses' ||
-        viewParam === 'last' ||
-        pageParam === 'last' ||
-        adminParam === 'true'
-      ) {
+      if (stepParam === '6' || viewParam === 'responses' || viewParam === 'last' || pageParam === 'last' || adminParam === 'true') {
         return 6;
       }
       if (stepParam && !isNaN(Number(stepParam))) {
         const s = Number(stepParam);
         if (s >= 1 && s <= 6) return s;
       }
-    } catch {
-      // fallback
-    }
+    } catch {}
     return 1;
   });
 
   const [noPosition, setNoPosition] = useState<{ left: number; top: number } | null>(null);
 
-  // Read saved choices so Admin immediately sees them on load
   const [selectedDate, setSelectedDate] = useState(() => {
-    try {
-      return localStorage.getItem(LOCAL_STORAGE_DATE) || '';
-    } catch {
-      return '';
-    }
+    try { return localStorage.getItem(LOCAL_STORAGE_DATE) || ''; } catch { return ''; }
   });
 
   const [selectedTime, setSelectedTime] = useState(() => {
-    try {
-      return localStorage.getItem(LOCAL_STORAGE_TIME) || '';
-    } catch {
-      return '';
-    }
+    try { return localStorage.getItem(LOCAL_STORAGE_TIME) || ''; } catch { return ''; }
   });
 
   const [selectedMeal, setSelectedMeal] = useState(() => {
-    try {
-      return localStorage.getItem(LOCAL_STORAGE_MEAL) || '';
-    } catch {
-      return '';
-    }
+    try { return localStorage.getItem(LOCAL_STORAGE_MEAL) || ''; } catch { return ''; }
   });
 
   const [dateError, setDateError] = useState('');
@@ -239,47 +216,33 @@ export default function App() {
   const [copiedAdminLink, setCopiedAdminLink] = useState(false);
 
   const [paid, setPaid] = useState(() => {
-    try {
-      return localStorage.getItem(LOCAL_STORAGE_PAID) === 'true';
-    } catch {
-      return false;
-    }
+    try { return localStorage.getItem(LOCAL_STORAGE_PAID) === 'true'; } catch { return false; }
   });
 
-  // Notification state
   const [notificationCopied, setNotificationCopied] = useState(false);
   const [showNotifyModal, setShowNotifyModal] = useState(false);
-
-  // Background scene mode: 'animated' (HD Cursor Tracking) or 'video' (Looping Video)
   const [bgMode, setBgMode] = useState<'animated' | 'video'>('animated');
-
-  // Periodic Floating Hearts state
   const [floatingHearts, setFloatingHearts] = useState<FloatingHeart[]>([]);
 
-  // Periodically generate floating hearts over the card
   useEffect(() => {
     const icons = ['💖', '💕', '💗', '🌸', '✨', '💓', '🥰', '💝'];
     const interval = setInterval(() => {
       const newHeart: FloatingHeart = {
         id: Date.now() + Math.random(),
-        left: Math.floor(Math.random() * 84) + 8, // 8% to 92% across card
-        size: Math.floor(Math.random() * 10) + 16, // 16px to 26px
-        duration: +(Math.random() * 1.5 + 3.8).toFixed(1), // 3.8s to 5.3s
+        left: Math.floor(Math.random() * 84) + 8,
+        size: Math.floor(Math.random() * 10) + 16,
+        duration: +(Math.random() * 1.5 + 3.8).toFixed(1),
         icon: icons[Math.floor(Math.random() * icons.length)],
       };
-
       setFloatingHearts((prev) => {
         const now = Date.now();
-        // Keep active hearts
         const active = prev.filter((h) => now - h.id < h.duration * 1000);
         return [...active, newHeart];
       });
     }, 1500);
-
     return () => clearInterval(interval);
   }, []);
 
-  // Chat state
   const [senderId, setSenderId] = useState('');
   const [storedName, setStoredName] = useState('');
   const [chatName, setChatName] = useState('');
@@ -291,7 +254,6 @@ export default function App() {
   const yesButtonRef = useRef<HTMLButtonElement>(null);
   const noButtonRef = useRef<HTMLButtonElement>(null);
 
-  // Initialize Chat storage
   useEffect(() => {
     try {
       let sId = localStorage.getItem(LOCAL_STORAGE_SENDER_ID);
@@ -303,17 +265,27 @@ export default function App() {
       setSenderId(sId);
       setStoredName(sName);
       setChatName(sName);
-
-      const storedMsgs = localStorage.getItem(LOCAL_STORAGE_MESSAGES);
-      if (storedMsgs) {
-        setMessages(JSON.parse(storedMsgs));
-      }
       setChatReady(true);
-    } catch {
-      // Ignore localStorage errors
-    }
+    } catch {}
   }, []);
 
+  // 3. FIREBASE REALTIME LISTENER YAHAN ADD KIYA GAYA HAI
+  useEffect(() => {
+    const messagesRef = ref(db, 'live_messages');
+    const unsubscribe = onValue(messagesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const msgs: ChatItem[] = Object.values(data);
+        msgs.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        setMessages(msgs);
+      } else {
+        setMessages([]);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 4. MESSAGE SEND KARNE KA FIREBASE LOGIC
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedName = chatName.trim();
@@ -324,51 +296,38 @@ export default function App() {
     localStorage.setItem(LOCAL_STORAGE_DISPLAY_NAME, shortName);
     setStoredName(shortName);
 
+    const msgId = Date.now().toString();
     const newMsg: ChatItem = {
-      id: Date.now().toString(),
+      id: msgId,
       senderId,
       senderName: shortName,
       content: trimmedContent,
       createdAt: new Date().toISOString(),
     };
 
-    const next = [...messages, newMsg];
-    setMessages(next);
+    // Firebase me push karna
+    set(ref(db, `live_messages/${msgId}`), newMsg);
     setChatContent('');
-    try {
-      localStorage.setItem(LOCAL_STORAGE_MESSAGES, JSON.stringify(next));
-    } catch {
-      // Ignore
-    }
   };
 
+  // 5. MESSAGE DELETE KARNE KA FIREBASE LOGIC
   const handleUnsendMessage = (id: string) => {
-    const next = messages.filter((m) => m.id !== id);
-    setMessages(next);
-    try {
-      localStorage.setItem(LOCAL_STORAGE_MESSAGES, JSON.stringify(next));
-    } catch {
-      // Ignore
-    }
+    remove(ref(db, `live_messages/${id}`));
   };
 
-  // Position runaway button initially beside YES button
   useLayoutEffect(() => {
     const shell = containerRef.current;
     const yesBtn = yesButtonRef.current;
     const noBtn = noButtonRef.current;
     if (!shell || !yesBtn || !noBtn) return;
-
     const yesRect = yesBtn.getBoundingClientRect();
     const bounds = getButtonBounds(noBtn);
     setNoPosition(clampPosition({ left: yesRect.right + 16, top: yesRect.top }, bounds));
   }, []);
 
-  // Reposition runaway button on resize / scroll
   useEffect(() => {
     const shell = containerRef.current;
     if (!shell) return;
-
     const handleResize = () => {
       const noBtn = noButtonRef.current;
       if (!noBtn) return;
@@ -379,7 +338,6 @@ export default function App() {
         return isSafePosition(shell, noBtn, clamped) ? clamped : calculateDodge(shell, noBtn, clamped);
       });
     };
-
     window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', handleResize, { passive: true });
     return () => {
@@ -397,7 +355,6 @@ export default function App() {
     setNoPosition(calculateDodge(shell, noBtn, curr));
   };
 
-  // Synchronize step changes with browser history and URL query parameter
   const goToStep = (newStep: number) => {
     setStep(newStep);
     try {
@@ -413,12 +370,9 @@ export default function App() {
         url.searchParams.set('step', newStep.toString());
       }
       window.history.replaceState({}, '', url.toString());
-    } catch {
-      // Ignore
-    }
+    } catch {}
   };
 
-  // Support browser Back/Forward navigation
   useEffect(() => {
     const handlePopState = () => {
       try {
@@ -438,16 +392,13 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // YES Click Animation & Transition
   const handleYesClick = () => {
-    // Joyful heart & sparkling confetti animation
     confetti({
       particleCount: 90,
       spread: 85,
       origin: { y: 0.6 },
       colors: ['#ff4081', '#f06292', '#f48fb1', '#ff80ab', '#ffffff', '#ffd166'],
     });
-
     setTimeout(() => {
       confetti({
         particleCount: 60,
@@ -456,11 +407,9 @@ export default function App() {
         colors: ['#c2185b', '#e91e63', '#ff80ab'],
       });
     }, 280);
-
     goToStep(2);
   };
 
-  // Clean Invite link for Palak (ALWAYS starts on Step 1, NO admin parameters)
   const copyInviteLink = async () => {
     try {
       const url = new URL(window.location.href);
@@ -481,7 +430,6 @@ export default function App() {
     }
   };
 
-  // Admin Direct Link to Step 6 (Responses & Chat) (Includes ?admin=true)
   const copyAdminLastPageLink = async () => {
     try {
       const url = new URL(window.location.href);
@@ -509,13 +457,10 @@ export default function App() {
     try {
       localStorage.setItem(LOCAL_STORAGE_DATE, selectedDate);
       localStorage.setItem(LOCAL_STORAGE_TIME, selectedTime);
-    } catch {
-      // Ignore
-    }
+    } catch {}
     goToStep(4);
   };
 
-  // Notification generation
   const generateNotificationSummary = () => {
     const dateText = selectedDate || 'To be decided';
     const timeText = selectedTime || '6:00 PM';
@@ -530,12 +475,11 @@ export default function App() {
     );
   };
 
-  // Automatically post notification message directly into local chat
+  // 6. AUTO NOTIFICATION KO BHI FIREBASE ME SET KARNA
   const postAutoNotificationToChat = (overrideDate?: string, overrideTime?: string, overrideMeal?: string) => {
     const d = overrideDate || selectedDate || 'To be decided';
     const t = overrideTime || selectedTime || '6:00 PM';
     const m = overrideMeal || selectedMeal || 'Surprise treat';
-
     const notifyContent =
       `💖 RSVP Confirmed: Palak said YES! 💖\n\n` +
       `📅 Date: ${d}\n` +
@@ -543,28 +487,17 @@ export default function App() {
       `🍽️ Craving: ${m}\n` +
       `🚗 Ready by 6 PM! Can't wait! 🥰✨`;
 
+    const msgId = 'rsvp_admin_msg';
     const newMsg: ChatItem = {
-      id: 'rsvp_' + Date.now(),
+      id: msgId,
       senderId: 'palak_auto_rsvp',
       senderName: 'Palak (RSVP)',
       content: notifyContent,
       createdAt: new Date().toISOString(),
     };
-
-    setMessages((prev) => {
-      // Keep only latest auto-rsvp to avoid duplicate clutter
-      const filtered = prev.filter((msg) => !msg.content.includes('RSVP Confirmed'));
-      const next = [...filtered, newMsg];
-      try {
-        localStorage.setItem(LOCAL_STORAGE_MESSAGES, JSON.stringify(next));
-      } catch {
-        // Ignore
-      }
-      return next;
-    });
+    set(ref(db, `live_messages/${msgId}`), newMsg);
   };
 
-  // Automatically trigger when entering step 6
   useEffect(() => {
     if (step === 6) {
       postAutoNotificationToChat();
@@ -592,7 +525,6 @@ export default function App() {
 
   return (
     <>
-      {/* Background: HD Interactive Animated Cat Scene or Looping Video */}
       {bgMode === 'animated' ? (
         <InteractiveCatScene />
       ) : (
@@ -612,7 +544,6 @@ export default function App() {
       )}
       <div className="bg-overlay" aria-hidden="true" />
 
-      {/* Background Mode Switcher Pill */}
       <button
         type="button"
         onClick={() => setBgMode(bgMode === 'animated' ? 'video' : 'animated')}
@@ -624,7 +555,6 @@ export default function App() {
         <span className="text-[10px] text-rose-600 font-bold underline">Switch</span>
       </button>
 
-      {/* Floating Notification Button to see choices */}
       {step >= 2 && (
         <button
           type="button"
@@ -637,7 +567,6 @@ export default function App() {
         </button>
       )}
 
-      {/* Top Floating Admin Direct Access Pill - ONLY VISIBLE TO ADMIN */}
       {isAdmin && (
         <div className="fixed top-4 right-4 z-40 flex items-center gap-2">
           {step !== 6 ? (
@@ -679,10 +608,8 @@ export default function App() {
         </div>
       )}
 
-      {/* Main Invitation Shell */}
       <main className="invite-shell" ref={containerRef}>
         <section className="invite-card" aria-label="A little date invitation">
-          {/* Periodic Floating Hearts Layer over the Card */}
           <div className="floating-hearts-layer" aria-hidden="true">
             {floatingHearts.map((heart) => (
               <span
@@ -699,7 +626,6 @@ export default function App() {
             ))}
           </div>
 
-          {/* Progress dots 1 to 6 */}
           <div
             className="progress"
             role="progressbar"
@@ -718,7 +644,6 @@ export default function App() {
             ))}
           </div>
 
-          {/* STEP 1: The Original Letter & Proposal */}
           <section className={`step${step === 1 ? ' is-active' : ''}`} data-step="1">
             <AnimatedTeddy />
             <h1>Palak, I like you so much.</h1>
@@ -753,7 +678,6 @@ export default function App() {
               {copiedLink ? 'Invite link copied ♥' : ''}
             </p>
 
-            {/* Admin / Creator Direct Access Section - ONLY SHOWN TO ADMIN */}
             {isAdmin && (
               <div className="admin-creator-box" aria-label="Admin creator tools">
                 <div className="admin-creator-header">
@@ -799,11 +723,8 @@ export default function App() {
             )}
           </section>
 
-          {/* STEP 2: Wait you actually said yes?? */}
           <section className={`step${step === 2 ? ' is-active' : ''}`} data-step="2">
-            <div className="step-illustration" aria-hidden="true">
-              🧽
-            </div>
+            <div className="step-illustration" aria-hidden="true">🧽</div>
             <h2>WAIT YOU ACTUALLY SAID YES??</h2>
             <p className="step-copy">I was so ready for you to say no 😂</p>
             <button
@@ -816,18 +737,13 @@ export default function App() {
             </button>
           </section>
 
-          {/* STEP 3: When are you free? */}
           <section className={`step${step === 3 ? ' is-active' : ''}`} data-step="3">
-            <div className="step-illustration" aria-hidden="true">
-              📅
-            </div>
+            <div className="step-illustration" aria-hidden="true">📅</div>
             <h2>So... when are you free?</h2>
             <form className="date-form" onSubmit={handleDateSubmit}>
               <div className="form-row">
                 <div>
-                  <label className="field-label" htmlFor="date-input">
-                    pick a date
-                  </label>
+                  <label className="field-label" htmlFor="date-input">pick a date</label>
                   <input
                     className="date-input"
                     id="date-input"
@@ -839,9 +755,7 @@ export default function App() {
                   />
                 </div>
                 <div>
-                  <label className="field-label" htmlFor="time-select">
-                    pick a time
-                  </label>
+                  <label className="field-label" htmlFor="time-select">pick a time</label>
                   <select
                     className="time-select"
                     id="time-select"
@@ -850,9 +764,7 @@ export default function App() {
                     onChange={(e) => setSelectedTime(e.target.value)}
                     data-testid="select-time"
                   >
-                    <option value="" disabled>
-                      select time
-                    </option>
+                    <option value="" disabled>select time</option>
                     {Array.from({ length: 9 }, (_, idx) => {
                       const hr = idx + 12;
                       const label = hr === 12 ? '12:00 PM' : `${hr - 12}:00 PM`;
@@ -874,7 +786,6 @@ export default function App() {
             </form>
           </section>
 
-          {/* STEP 4: What are we feeling? */}
           <section className={`step${step === 4 ? ' is-active' : ''}`} data-step="4">
             <h2>What are we feeling? 🍽✨</h2>
             <p className="step-copy">pick your vibe</p>
@@ -887,29 +798,20 @@ export default function App() {
                   aria-pressed={selectedMeal === meal.name}
                   onClick={() => {
                     setSelectedMeal(meal.name);
-                    try {
-                      localStorage.setItem(LOCAL_STORAGE_MEAL, meal.name);
-                    } catch {
-                      // Ignore
-                    }
+                    try { localStorage.setItem(LOCAL_STORAGE_MEAL, meal.name); } catch {}
                     goToStep(5);
                   }}
                   data-testid={`choice-meal-${meal.name.toLowerCase()}`}
                 >
-                  <span className="choice-emoji" aria-hidden="true">
-                    {meal.emoji}
-                  </span>
+                  <span className="choice-emoji" aria-hidden="true">{meal.emoji}</span>
                   {meal.name}
                 </button>
               ))}
             </div>
           </section>
 
-          {/* STEP 5: Glad you didn't say no */}
           <section className={`step${step === 5 ? ' is-active' : ''}`} data-step="5">
-            <div className="step-illustration" aria-hidden="true">
-              🚗
-            </div>
+            <div className="step-illustration" aria-hidden="true">🚗</div>
             <h2>glad you didn't say no. be ready by 6, I'm coming to get you 🚗</h2>
             <button
               className="pill-button"
@@ -921,11 +823,8 @@ export default function App() {
             </button>
           </section>
 
-          {/* STEP 6: One small fee & Shared Chat */}
           <section className={`step${step === 6 ? ' is-active' : ''}`} data-step="6">
-            <div className="step-illustration" aria-hidden="true">
-              💌
-            </div>
+            <div className="step-illustration" aria-hidden="true">💌</div>
             <h2>one small fee</h2>
             <p className="step-copy">it is a normal transaction.</p>
             <div className="receipt" aria-label="Date Agreement receipt">
@@ -943,11 +842,7 @@ export default function App() {
               type="button"
               onClick={() => {
                 setPaid(true);
-                try {
-                  localStorage.setItem(LOCAL_STORAGE_PAID, 'true');
-                } catch {
-                  // Ignore
-                }
+                try { localStorage.setItem(LOCAL_STORAGE_PAID, 'true'); } catch {}
               }}
               data-testid="button-pay-joke"
             >
@@ -963,7 +858,6 @@ export default function App() {
               </p>
             )}
 
-            {/* ADMIN / CREATOR PANEL: ONLY SHOWN IN ADMIN MODE */}
             {isAdmin && (
               <div className="admin-responses-card" aria-label="Admin responses summary">
                 <div className="admin-responses-top">
@@ -1055,7 +949,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Notification Section: Summary of what she chose */}
             <div className="notify-box" aria-label="Notification details">
               <div className="notify-header">
                 <span className="notify-title">
@@ -1122,7 +1015,6 @@ export default function App() {
           </section>
         </section>
 
-        {/* Runaway No button (only on step 1) */}
         {step === 1 && (
           <button
             ref={noButtonRef}
@@ -1138,7 +1030,6 @@ export default function App() {
           </button>
         )}
 
-        {/* STEP 6: THE EXACT INLINE CHAT SECTION */}
         {step === 6 && (
           <section
             id="shared-chat"
@@ -1272,7 +1163,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Floating Choices Summary Popover Modal */}
       {showNotifyModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
