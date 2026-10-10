@@ -649,7 +649,7 @@ export default function App() {
             <h1>Mansha, I like you so much.</h1>
             <div className="intro-copy">
               <p>
-                Actually, I’ve liked you since the very first time I saw you in 11th. The moment I saw you, I fell for you… like I was falling into a black hole. Till 12th I was stuck in the event...
+                Actually, I’ve liked you since the very first time I saw you in 11th. The moment I saw you, I fell for you… like I was falling into a black hole. Till 12th I was stuck in the event horizon, trying so hard to escape, but I couldn’t. Even after our farewell, I still kept falling.
               </p>
               <p>So this is it.</p>
             </div>
@@ -1033,39 +1033,39 @@ export default function App() {
         {step === 6 && (
           <section
             id="shared-chat"
-            className="palak-inline-chat"
+            className="mansha-inline-chat"
             aria-label="Our shared conversation"
             data-testid="section-inline-chat"
           >
-            <header className="palak-inline-chat-heading">
-              <span className="palak-inline-chat-icon" aria-hidden="true">
+            <header className="mansha-inline-chat-heading">
+              <span className="mansha-inline-chat-icon" aria-hidden="true">
                 <MessageSquare size={18} />
               </span>
               <div>
-                <p className="palak-inline-chat-eyebrow">A little space for us</p>
+                <p className="mansha-inline-chat-eyebrow">A little space for us</p>
                 <h2>Our conversation</h2>
-                <p className="palak-inline-chat-subtitle">The date invite, continued.</p>
+                <p className="mansha-inline-chat-subtitle">The date invite, continued.</p>
               </div>
-              <span className="palak-inline-chat-presence">
+              <span className="mansha-inline-chat-presence">
                 <i aria-hidden="true" />
                 just us
               </span>
             </header>
 
             <div
-              className="palak-inline-chat-thread"
+              className="mansha-inline-chat-thread"
               aria-label="Messages"
               aria-live="polite"
               aria-relevant="additions text"
             >
               {messages.length === 0 ? (
-                <div className="palak-inline-chat-state" data-testid="status-inline-chat-empty">
+                <div className="mansha-inline-chat-state" data-testid="status-inline-chat-empty">
                   <strong>Say the first thing.</strong>
                   <span>Plans, questions, little thoughts — they can all start here.</span>
                 </div>
               ) : (
-                <div className="palak-inline-chat-list">
-                  <div className="palak-inline-chat-divider">
+                <div className="mansha-inline-chat-list">
+                  <div className="mansha-inline-chat-divider">
                     <span>today</span>
                   </div>
                   {messages.map((msg) => {
@@ -1074,26 +1074,26 @@ export default function App() {
                     return (
                       <article
                         key={msg.id}
-                        className={`palak-inline-chat-message${isOwn ? ' is-own' : ''}`}
+                        className={`mansha-inline-chat-message${isOwn ? ' is-own' : ''}`}
                         data-testid={`inline-chat-message-${msg.id}`}
                       >
                         {!isOwn && (
-                          <span className="palak-inline-chat-avatar" aria-hidden="true">
+                          <span className="mansha-inline-chat-avatar" aria-hidden="true">
                             {isRsvp ? '💖' : (msg.senderName.trim().slice(0, 1).toUpperCase() || '?')}
                           </span>
                         )}
-                        <div className="palak-inline-chat-message-body">
-                          <div className="palak-inline-chat-meta">
+                        <div className="mansha-inline-chat-message-body">
+                          <div className="mansha-inline-chat-meta">
                             <span>{isOwn ? 'You' : msg.senderName}</span>
                             <time dateTime={msg.createdAt}>{formatChatTime(msg.createdAt)}</time>
                           </div>
-                          <div className={`palak-inline-chat-bubble${isRsvp ? ' is-rsvp' : ''}`}>
+                          <div className={`mansha-inline-chat-bubble${isRsvp ? ' is-rsvp' : ''}`}>
                             {msg.content}
                           </div>
                         </div>
                         {isOwn && !isRsvp && (
                           <button
-                            className="palak-inline-chat-unsend"
+                            className="mansha-inline-chat-unsend"
                             type="button"
                             onClick={() => handleUnsendMessage(msg.id)}
                             aria-label={`Unsend message`}
@@ -1109,11 +1109,11 @@ export default function App() {
               )}
             </div>
 
-            <form className="palak-inline-chat-composer" onSubmit={handleSendMessage}>
-              <div className="palak-inline-chat-name">
-                <label htmlFor="palak-inline-chat-name">Your name</label>
+            <form className="mansha-inline-chat-composer" onSubmit={handleSendMessage}>
+              <div className="mansha-inline-chat-name">
+                <label htmlFor="mansha-inline-chat-name">Your name</label>
                 <input
-                  id="palak-inline-chat-name"
+                  id="mansha-inline-chat-name"
                   type="text"
                   value={chatName}
                   onChange={(e) => setChatName(e.target.value.slice(0, 32))}
@@ -1125,12 +1125,12 @@ export default function App() {
                 <span>{storedName ? 'saved for next time' : 'only shown in this chat'}</span>
               </div>
 
-              <div className="palak-inline-chat-compose">
-                <label className="palak-inline-chat-sr-only" htmlFor="palak-inline-chat-message">
+              <div className="mansha-inline-chat-compose">
+                <label className="mansha-inline-chat-sr-only" htmlFor="mansha-inline-chat-message">
                   Write a message
                 </label>
                 <textarea
-                  id="palak-inline-chat-message"
+                  id="mansha-inline-chat-message"
                   value={chatContent}
                   onChange={(e) => setChatContent(e.target.value.slice(0, 1000))}
                   placeholder="Write something sweet..."
@@ -1154,7 +1154,7 @@ export default function App() {
                 </button>
               </div>
 
-              <div className="palak-inline-chat-foot">
+              <div className="mansha-inline-chat-foot">
                 <span>Enter to send · Shift + Enter for a new line</span>
                 <span>{chatContent.length}/1000</span>
               </div>
