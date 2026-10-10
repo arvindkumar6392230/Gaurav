@@ -653,7 +653,7 @@ select:focus-visible,
 }
 
 /* EXACT INLINE CHAT STYLES FROM REPLIT APP */
-.palak-inline-chat {
+.mansha-inline-chat {
   --inline-ink: #762b48;
   --inline-body: #744b5b;
   --inline-muted: #a47787;
@@ -674,32 +674,32 @@ select:focus-visible,
   position: relative;
 }
 
-.palak-inline-chat,
-.palak-inline-chat * {
+.mansha-inline-chat,
+.mansha-inline-chat * {
   box-sizing: border-box;
 }
 
-.palak-inline-chat button,
-.palak-inline-chat input,
-.palak-inline-chat textarea {
+.mansha-inline-chat button,
+.mansha-inline-chat input,
+.mansha-inline-chat textarea {
   font: inherit;
 }
 
-.palak-inline-chat button:focus-visible,
-.palak-inline-chat input:focus-visible,
-.palak-inline-chat textarea:focus-visible {
+.mansha-inline-chat button:focus-visible,
+.mansha-inline-chat input:focus-visible,
+.mansha-inline-chat textarea:focus-visible {
   outline: 3px solid rgba(194, 70, 112, 0.38);
   outline-offset: 3px;
 }
 
-.palak-inline-chat-heading {
+.mansha-inline-chat-heading {
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 19px 22px 15px;
 }
 
-.palak-inline-chat-icon {
+.mansha-inline-chat-icon {
   display: grid;
   flex: 0 0 auto;
   place-items: center;
@@ -712,11 +712,11 @@ select:focus-visible,
   transform: rotate(-4deg);
 }
 
-.palak-inline-chat-heading > div {
+.mansha-inline-chat-heading > div {
   min-width: 0;
 }
 
-.palak-inline-chat-eyebrow {
+.mansha-inline-chat-eyebrow {
   margin: 0 0 3px;
   color: #b36b83;
   font-size: 0.59rem;
@@ -725,7 +725,7 @@ select:focus-visible,
   text-transform: uppercase;
 }
 
-.palak-inline-chat-heading h2 {
+.mansha-inline-chat-heading h2 {
   margin: 0;
   color: var(--inline-ink);
   font-family: 'Playfair Display', Georgia, serif;
@@ -733,13 +733,13 @@ select:focus-visible,
   line-height: 1.1;
 }
 
-.palak-inline-chat-subtitle {
+.mansha-inline-chat-subtitle {
   margin: 4px 0 0;
   color: #956779;
   font-size: 0.69rem;
 }
 
-.palak-inline-chat-presence {
+.mansha-inline-chat-presence {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -754,7 +754,7 @@ select:focus-visible,
   white-space: nowrap;
 }
 
-.palak-inline-chat-presence i {
+.mansha-inline-chat-presence i {
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -762,7 +762,7 @@ select:focus-visible,
   box-shadow: 0 0 0 3px #f9e5eb;
 }
 
-.palak-inline-chat-thread {
+.mansha-inline-chat-thread {
   max-height: 255px;
   min-height: 126px;
   overflow-y: auto;
@@ -771,13 +771,13 @@ select:focus-visible,
   scrollbar-width: thin;
 }
 
-.palak-inline-chat-list {
+.mansha-inline-chat-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.palak-inline-chat-divider {
+.mansha-inline-chat-divider {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -788,15 +788,15 @@ select:focus-visible,
   letter-spacing: 0.06em;
 }
 
-.palak-inline-chat-divider:before,
-.palak-inline-chat-divider:after {
+.mansha-inline-chat-divider:before,
+.mansha-inline-chat-divider:after {
   height: 1px;
   flex: 1;
   background: #f3e3e8;
   content: "";
 }
 
-.palak-inline-chat-message {
+.mansha-inline-chat-message {
   display: flex;
   align-items: flex-end;
   gap: 8px;
@@ -805,13 +805,13 @@ select:focus-visible,
   animation: inline-chat-arrive 0.22s ease both;
 }
 
-.palak-inline-chat-message.is-own {
+.mansha-inline-chat-message.is-own {
   flex-direction: row-reverse;
   margin-right: 0;
   margin-left: auto;
 }
 
-.palak-inline-chat-avatar {
+.mansha-inline-chat-avatar {
   display: grid;
   flex: 0 0 auto;
   place-items: center;
@@ -826,11 +826,11 @@ select:focus-visible,
   font-weight: 700;
 }
 
-.palak-inline-chat-message-body {
+.mansha-inline-chat-message-body {
   min-width: 0;
 }
 
-.palak-inline-chat-meta {
+.mansha-inline-chat-meta {
   display: flex;
   align-items: baseline;
   gap: 7px;
@@ -840,17 +840,17 @@ select:focus-visible,
   font-weight: 700;
 }
 
-.palak-inline-chat-meta time {
+.mansha-inline-chat-meta time {
   color: #b89ba5;
   font-size: 0.56rem;
   font-weight: 400;
 }
 
-.palak-inline-chat-message.is-own .palak-inline-chat-meta {
+.mansha-inline-chat-message.is-own .mansha-inline-chat-meta {
   justify-content: flex-end;
 }
 
-.palak-inline-chat-bubble {
+.mansha-inline-chat-bubble {
   padding: 8px 12px;
   border: 1px solid #f1dce3;
   border-radius: 4px 14px 14px;
@@ -862,7 +862,7 @@ select:focus-visible,
   white-space: pre-wrap;
 }
 
-.palak-inline-chat-bubble.is-rsvp {
+.mansha-inline-chat-bubble.is-rsvp {
   border: 1.5px solid rgba(244, 143, 177, 0.85);
   background: linear-gradient(135deg, rgba(255, 240, 245, 0.95), rgba(253, 231, 239, 0.95));
   color: #702e49;
@@ -870,14 +870,14 @@ select:focus-visible,
   box-shadow: 0 4px 14px rgba(200, 90, 123, 0.15);
 }
 
-.palak-inline-chat-message.is-own .palak-inline-chat-bubble {
+.mansha-inline-chat-message.is-own .mansha-inline-chat-bubble {
   border-color: #f2c6d5;
   border-radius: 14px 4px 14px 14px;
   color: #702e49;
   background: rgba(252, 231, 238, 0.95);
 }
 
-.palak-inline-chat-unsend {
+.mansha-inline-chat-unsend {
   display: grid;
   flex: 0 0 auto;
   place-items: center;
@@ -892,17 +892,17 @@ select:focus-visible,
   opacity: 0.75;
 }
 
-.palak-inline-chat-unsend:hover:not(:disabled) {
+.mansha-inline-chat-unsend:hover:not(:disabled) {
   background: #fdebf1;
   opacity: 1;
 }
 
-.palak-inline-chat-unsend:disabled {
+.mansha-inline-chat-unsend:disabled {
   cursor: wait;
   opacity: 0.45;
 }
 
-.palak-inline-chat-state {
+.mansha-inline-chat-state {
   display: flex;
   min-height: 104px;
   flex-direction: column;
@@ -913,39 +913,39 @@ select:focus-visible,
   text-align: center;
 }
 
-.palak-inline-chat-state strong {
+.mansha-inline-chat-state strong {
   color: var(--inline-ink);
   font-family: 'Playfair Display', Georgia, serif;
   font-size: 1.08rem;
 }
 
-.palak-inline-chat-state > span {
+.mansha-inline-chat-state > span {
   color: #956779;
   font-size: 0.69rem;
   line-height: 1.5;
 }
 
-.palak-inline-chat-composer {
+.mansha-inline-chat-composer {
   padding: 11px 18px 13px;
   border-top: 1px solid #f3e5ea;
   background: rgba(255, 251, 252, 0.85);
 }
 
-.palak-inline-chat-name {
+.mansha-inline-chat-name {
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 0 0 8px 2px;
 }
 
-.palak-inline-chat-name label {
+.mansha-inline-chat-name label {
   color: #9e6378;
   font-size: 0.61rem;
   font-weight: 700;
   white-space: nowrap;
 }
 
-.palak-inline-chat-name input {
+.mansha-inline-chat-name input {
   width: min(155px, 44%);
   min-width: 0;
   border: 0;
@@ -957,24 +957,24 @@ select:focus-visible,
   font-size: 0.66rem;
 }
 
-.palak-inline-chat-name input:focus {
+.mansha-inline-chat-name input:focus {
   outline: none;
   border-bottom-color: #c85a7b;
 }
 
-.palak-inline-chat-name input::placeholder,
-.palak-inline-chat-compose textarea::placeholder {
+.mansha-inline-chat-name input::placeholder,
+.mansha-inline-chat-compose textarea::placeholder {
   color: #bd9ba7;
 }
 
-.palak-inline-chat-name > span {
+.mansha-inline-chat-name > span {
   margin-left: auto;
   color: #b59aa4;
   font-size: 0.58rem;
   text-align: right;
 }
 
-.palak-inline-chat-compose {
+.mansha-inline-chat-compose {
   display: flex;
   align-items: flex-end;
   gap: 8px;
@@ -985,12 +985,12 @@ select:focus-visible,
   box-shadow: 0 4px 12px rgba(137, 58, 91, 0.05);
 }
 
-.palak-inline-chat-compose:focus-within {
+.mansha-inline-chat-compose:focus-within {
   border-color: #dc91a8;
   box-shadow: 0 0 0 3px rgba(220, 145, 168, 0.15);
 }
 
-.palak-inline-chat-compose textarea {
+.mansha-inline-chat-compose textarea {
   flex: 1;
   min-width: 0;
   min-height: 34px;
@@ -1005,7 +1005,7 @@ select:focus-visible,
   line-height: 1.45;
 }
 
-.palak-inline-chat-compose button {
+.mansha-inline-chat-compose button {
   display: grid;
   flex: 0 0 auto;
   place-items: center;
@@ -1020,17 +1020,17 @@ select:focus-visible,
   transition: background-color 0.15s ease;
 }
 
-.palak-inline-chat-compose button:hover:not(:disabled) {
+.mansha-inline-chat-compose button:hover:not(:disabled) {
   background: #b94e70;
 }
 
-.palak-inline-chat-compose button:disabled {
+.mansha-inline-chat-compose button:disabled {
   cursor: not-allowed;
   opacity: 0.47;
   box-shadow: none;
 }
 
-.palak-inline-chat-foot {
+.mansha-inline-chat-foot {
   display: flex;
   justify-content: space-between;
   gap: 8px;
@@ -1039,7 +1039,7 @@ select:focus-visible,
   font-size: 0.56rem;
 }
 
-.palak-inline-chat-sr-only {
+.mansha-inline-chat-sr-only {
   position: absolute;
   overflow: hidden;
   width: 1px;
