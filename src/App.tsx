@@ -547,7 +547,7 @@ export default function App() {
       <button
         type="button"
         onClick={() => setBgMode(bgMode === 'animated' ? 'video' : 'animated')}
-        className="fixed bottom-4 left-4 z-40 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-white/75 hover:bg-white/90 backdrop-blur-md border border-white/80 shadow-md text-slate-700 transition-all"
+        className="fixed bottom-4 left-4 z-40 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-white/75 hover:bg-white/90 backdrop-blur-md border border-white/80 shadow-md text-slate-700 transition-all cursor-pointer flex items-center gap-1.5"
         title="Toggle between HD cursor-following cat animation and video"
       >
         <Sparkles size={12} className="text-pink-500" />
@@ -649,7 +649,7 @@ export default function App() {
             <h1>Mansha, I like you so much.</h1>
             <div className="intro-copy">
               <p>
-                Actually, I’ve liked you since the very first time I saw you in 11th. The moment I saw you, I fell for you… like I was falling into a black hole. Till 12th I was stuck in the event horizon, trying so hard to escape, but I couldn’t. Even after our farewell, I still kept falling.
+                Actually, I’ve liked you since the very first time I saw you in 11th. The moment I saw you, I fell for you… like I was falling into a black hole. Till 12th I was stuck in the event...
               </p>
               <p>So this is it.</p>
             </div>
