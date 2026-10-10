@@ -62,13 +62,13 @@ const MEALS = [
   { name: 'Ramen', emoji: '🍜' },
 ];
 
-const LOCAL_STORAGE_SENDER_ID = 'palak-chat-sender-id';
-const LOCAL_STORAGE_DISPLAY_NAME = 'palak-chat-display-name';
-const LOCAL_STORAGE_DATE = 'palak-date-choice';
-const LOCAL_STORAGE_TIME = 'palak-time-choice';
-const LOCAL_STORAGE_MEAL = 'palak-meal-choice';
-const LOCAL_STORAGE_PAID = 'palak-paid-confirmed';
-const LOCAL_STORAGE_IS_ADMIN = 'palak-invite-is-admin';
+const LOCAL_STORAGE_SENDER_ID = 'mansha-chat-sender-id';
+const LOCAL_STORAGE_DISPLAY_NAME = 'mansha-chat-display-name';
+const LOCAL_STORAGE_DATE = 'mansha-date-choice';
+const LOCAL_STORAGE_TIME = 'mansha-time-choice';
+const LOCAL_STORAGE_MEAL = 'mansha-meal-choice';
+const LOCAL_STORAGE_PAID = 'mansha-paid-confirmed';
+const LOCAL_STORAGE_IS_ADMIN = 'mansha-invite-is-admin';
 
 function getButtonBounds(el: HTMLElement) {
   const w = el.offsetWidth;
@@ -426,7 +426,7 @@ export default function App() {
       const url = new URL(window.location.href);
       url.searchParams.delete('step');
       url.searchParams.delete('admin');
-      window.prompt('Copy invite link for Palak (Visitor View):', url.toString());
+      window.prompt('Copy invite link for Mansha (Visitor View):', url.toString());
     }
   };
 
@@ -466,7 +466,7 @@ export default function App() {
     const timeText = selectedTime || '6:00 PM';
     const mealText = selectedMeal || 'Surprise treat';
     return (
-      `💖 Palak said YES to your date invite! 💖\n\n` +
+      `💖 Mansha said YES to your date invite! 💖\n\n` +
       `📅 Date: ${dateText}\n` +
       `⏰ Time: ${timeText}\n` +
       `🍽️ Craving: ${mealText}\n` +
@@ -481,17 +481,17 @@ export default function App() {
     const t = overrideTime || selectedTime || '6:00 PM';
     const m = overrideMeal || selectedMeal || 'Surprise treat';
     const notifyContent =
-      `💖 RSVP Confirmed: Palak said YES! 💖\n\n` +
+      `💖 RSVP Confirmed: Mansha said YES! 💖\n\n` +
       `📅 Date: ${d}\n` +
       `⏰ Time: ${t}\n` +
       `🍽️ Craving: ${m}\n` +
       `🚗 Ready by 6 PM! Can't wait! 🥰✨`;
 
-    const msgId = 'rsvp_admin_msg';
+    const msgId = 'mansha_admin_msg';
     const newMsg: ChatItem = {
       id: msgId,
-      senderId: 'palak_auto_rsvp',
-      senderName: 'Palak (RSVP)',
+      senderId: 'mansha_auto_rsvp',
+      senderName: 'Mansha (RSVP)',
       content: notifyContent,
       createdAt: new Date().toISOString(),
     };
@@ -510,7 +510,7 @@ export default function App() {
   };
 
   const handleNotifyEmail = () => {
-    const subject = encodeURIComponent('Palak said YES! 💖 (Date Invite RSVP)');
+    const subject = encodeURIComponent('Mansha said YES! 💖 (Date Invite RSVP)');
     const body = encodeURIComponent(generateNotificationSummary());
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
   };
@@ -547,7 +547,7 @@ export default function App() {
       <button
         type="button"
         onClick={() => setBgMode(bgMode === 'animated' ? 'video' : 'animated')}
-        className="fixed bottom-4 left-4 z-40 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-white/75 hover:bg-white/90 backdrop-blur-md border border-white/80 shadow-md text-slate-700 transition-all cursor-pointer flex items-center gap-1.5"
+        className="fixed bottom-4 left-4 z-40 text-[11px] font-semibold px-3 py-1.5 rounded-full bg-white/75 hover:bg-white/90 backdrop-blur-md border border-white/80 shadow-md text-slate-700 transition-all"
         title="Toggle between HD cursor-following cat animation and video"
       >
         <Sparkles size={12} className="text-pink-500" />
@@ -573,8 +573,8 @@ export default function App() {
             <button
               type="button"
               onClick={() => goToStep(6)}
-              className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-rose-300 shadow-md text-rose-900 transition-all flex items-center gap-1.5 cursor-pointer hover:shadow-lg hover:border-rose-400 group"
-              title="Admin: View Palak's selected choices & chat on the last page"
+              className="text-xs font-semibold px-3.5 py-1.5 rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-rose-300 shadow-md text-rose-900 transition-all flex items-center gap-1.5"
+              title="Admin: View Mansha's selected choices & chat on the last page"
             >
               <Crown size={14} className="text-amber-500 group-hover:scale-110 transition-transform" />
               <span>Admin: Responses &amp; Chat</span>
@@ -589,7 +589,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => goToStep(1)}
-                className="text-xs font-semibold px-2.5 py-1.5 rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-rose-200 shadow-sm text-slate-700 transition-all flex items-center gap-1 cursor-pointer"
+                className="text-xs font-semibold px-2.5 py-1.5 rounded-full bg-white/90 hover:bg-white backdrop-blur-md border border-rose-200 shadow-sm text-slate-700 transition-all flex items-center gap-1"
                 title="Preview Step 1 Invitation"
               >
                 <ArrowLeft size={12} />
@@ -646,10 +646,10 @@ export default function App() {
 
           <section className={`step${step === 1 ? ' is-active' : ''}`} data-step="1">
             <AnimatedTeddy />
-            <h1>Palak, I like you so much.</h1>
+            <h1>Mansha, I like you so much.</h1>
             <div className="intro-copy">
               <p>
-                Actually, I’ve liked you since the very first time I saw you in 11th. The moment I saw you, I fell for you… like I was falling into a black hole. Till 12th I was stuck in the event horizon, trying so hard to escape, but I couldn’t. Even after our farewell, I still kept falling.
+                Actually, I’ve liked you since the very first time I saw you in 11th. The moment I saw you, I fell for you… like I was falling into a black hole. Till 12th I was stuck in the event...
               </p>
               <p>So this is it.</p>
             </div>
@@ -688,7 +688,7 @@ export default function App() {
                   <span className="admin-creator-pill">Secret Admin Mode</span>
                 </div>
                 <p className="admin-creator-desc">
-                  Check what Palak selected (date, time, food vibe) &amp; what she wants to talk about.
+                  Check what Mansha selected (date, time, food vibe) &amp; what she wants to talk about.
                 </p>
                 <div className="admin-creator-actions">
                   <button
@@ -863,7 +863,7 @@ export default function App() {
                 <div className="admin-responses-top">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900">
                     <Crown size={15} className="text-amber-600" />
-                    <span>Admin Panel: What Palak Selected &amp; Chat</span>
+                    <span>Admin Panel: What Mansha Selected &amp; Chat</span>
                   </div>
                   <span className="text-[11px] font-semibold text-rose-700 bg-rose-100/90 px-2 py-0.5 rounded-full border border-rose-200/80">
                     Confirmed Choices
@@ -877,7 +877,7 @@ export default function App() {
                   </div>
                   <div className="admin-selection-item">
                     <span className="admin-label">📅 Chosen Date</span>
-                    <span className="admin-val">{selectedDate || 'Waiting for Palak to pick'}</span>
+                    <span className="admin-val">{selectedDate || 'Waiting for Mansha to pick'}</span>
                   </div>
                   <div className="admin-selection-item">
                     <span className="admin-label">⏰ Chosen Time</span>
@@ -920,7 +920,7 @@ export default function App() {
                     type="button"
                     onClick={copyInviteLink}
                     className="admin-card-btn secondary"
-                    title="Copy clean invitation link for Palak"
+                    title="Copy clean invitation link for Mansha"
                   >
                     {copiedLink ? (
                       <>
@@ -930,7 +930,7 @@ export default function App() {
                     ) : (
                       <>
                         <Copy size={13} />
-                        <span>Copy Palak's Invite Link 💌</span>
+                        <span>Copy Mansha's Invite Link 💌</span>
                       </>
                     )}
                   </button>
@@ -1070,7 +1070,7 @@ export default function App() {
                   </div>
                   {messages.map((msg) => {
                     const isOwn = msg.senderId === senderId;
-                    const isRsvp = msg.senderId === 'palak_auto_rsvp' || msg.content.includes('RSVP Confirmed');
+                    const isRsvp = msg.senderId === 'mansha_auto_rsvp' || msg.content.includes('RSVP Confirmed');
                     return (
                       <article
                         key={msg.id}
